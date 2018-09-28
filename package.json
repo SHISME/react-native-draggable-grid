@@ -17,7 +17,7 @@
     "built": "rm -rf built && tsc",
     "watch": "tsc -w --outDir demo/built"
   },
-  "author": "SH",
+  "author": "shisme",
   "license": "ISC",
   "devDependencies": {
     "@types/react": "*",
