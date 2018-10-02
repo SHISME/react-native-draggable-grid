@@ -20,11 +20,10 @@ export class Block extends React.Component<BlockProps>{
   public render() {
     return (
       <Animated.View
-        style={[styles.blockContainer, this.props.style]}
+        style={[styles.blockContainer, this.props.style, this.props.dragStartAnimationStyle]}
         {...this.props.panHandlers}
       >
         <Animated.View
-          style={this.props.dragStartAnimationStyle}
         >
           <TouchableWithoutFeedback
             onPress={this.props.onPress}
