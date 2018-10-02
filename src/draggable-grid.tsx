@@ -18,7 +18,7 @@ export interface IOnLayoutEvent {
 export interface IDraggableGridProps<DataType extends {key:string}>{
   numColumns:number;
   data:DataType[];
-  renderItem:(item:DataType) => React.ReactElement<any>;
+  renderItem:(item:DataType, order:number) => React.ReactElement<any>;
   itemHeight?:number;
   dragStartAnimation?:StyleProp<any>;
   onItemPress?:(item:DataType) => void;
@@ -44,7 +44,6 @@ interface IOrderMapItem {
 interface IItem {
   key:string;
   itemData:any;
-  element:React.ReactElement<any>;
   currentPosition:Animated.AnimatedValueXY;
 }
 export class DraggableGrid<DataType extends {key:string}> extends React.Component<IDraggableGridProps<DataType>, IDraggableGridState>{
@@ -111,7 +110,6 @@ export class DraggableGrid<DataType extends {key:string}> extends React.Componen
     this.items.push({
       key:item.key,
       itemData:item,
-      element:this.props.renderItem(item),
       currentPosition:new Animated.ValueXY(this.getBlockPositionByOrder(index)),
     });
     
@@ -132,7 +130,6 @@ export class DraggableGrid<DataType extends {key:string}> extends React.Componen
       return {
         key:item.key,
         itemData:item,
-        element:this.props.renderItem(item),
         currentPosition:new Animated.ValueXY()
       };
     })
@@ -157,7 +154,7 @@ export class DraggableGrid<DataType extends {key:string}> extends React.Componen
                 dragStartAnimationStyle={this.getDragStartAnimation(itemIndex)}
                 key={item.key}
               >
-                {item.element}
+                { this.props.renderItem(item.itemData, this.orderMap[item.key].order) }
               </Block>
             );
           })

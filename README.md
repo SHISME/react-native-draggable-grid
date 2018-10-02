@@ -108,5 +108,61 @@ const styles = StyleSheet.create({
 
 ```
 
-# Props
+## Props
 
+| parameter  | type   | required | description | default|
+| :--------  | :----  | :------- | :---------- | :----- |
+| numColumns | number | yes      | how many items should be render on one row|  |
+| data       | array  | yes      | data's item must have unique key，item's render will depend on the key| |
+| renderItem |(item, order:number) => void| yes | Takes an item from data and renders it into the list | |
+| itemHeight | number | no       | if not set this, it will the same as itemWidth | |
+| dragStartAnimation | object | no | custom drag start animation | |
+
+## Event Props
+
+
+| parameter  | type   | required | description |
+| :--------  | :----  | :------- | :---------- |
+| onItemPress | (item) => void | no      | Function will execute when item on press |
+| onDragStart | (startDragItem) => void | no | Function will execute when item start drag |
+| onDragRelease | (data) => void | no | Function will execute when item release, and will return the new ordered data |
+
+## Custom Drag Start Animation
+
+If you want to use your custom animation, you can do like this
+
+```javascript
+
+ render() {
+    return (
+      <View style={styles.wrapper}>
+        <DraggableGrid
+          numColumns={4}
+          renderItem={this.render_item}
+          data={this.state.data}
+          onDragStart={this.onDragStart}
+          dragStartAnimation={{
+            transform:[
+              {scale:this.state.animatedValue}
+            ],
+          }}
+        />
+      </View>
+    );
+  }
+
+  private onDragStart = () => {
+    this.state.animatedValue.setValue(1);
+    Animated.timing(this.state.animatedValue, {
+      toValue:3,
+      duration:400,
+    }).start();
+  }
+
+```
+
+## Resort item
+
+if you want resort item yourself,you only need change the data's sort, and the draggable-grid will auto resort by your data.
+
+> the data's key must unique
