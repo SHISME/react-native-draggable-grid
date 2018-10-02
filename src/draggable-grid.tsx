@@ -205,7 +205,7 @@ export class DraggableGrid<DataType extends {key:string}> extends React.Componen
       dragStartAnimation = this.getDefaultDragStartAnimation();
     }
     return {
-      zIndex:1,
+      zIndex:3,
       ...dragStartAnimation,
     };
   }
