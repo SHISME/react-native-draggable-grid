@@ -7,6 +7,7 @@ import {
   StyleProp,
   GestureResponderEvent,
   PanResponderGestureState,
+  ViewStyle,
 } from 'react-native';
 import { findKey, differenceBy, forOwn } from 'lodash';
 import { Block } from './block';
@@ -15,10 +16,15 @@ export interface IOnLayoutEvent {
   nativeEvent: { layout: { x: number; y: number; width: number; height: number } }
 };
 
-export interface IDraggableGridProps<DataType extends {key:string}>{
+interface IBaseItemType {
+  key:string;
+}
+
+export interface IDraggableGridProps<DataType extends IBaseItemType>{
   numColumns:number;
   data:DataType[];
   renderItem:(item:DataType, order:number) => React.ReactElement<any>;
+  style?:ViewStyle;
   itemHeight?:number;
   dragStartAnimation?:StyleProp<any>;
   onItemPress?:(item:DataType) => void;
@@ -41,18 +47,18 @@ interface IOrderMapItem {
   order:number;
   itemIndex:number;
 }
-interface IItem {
+interface IItem <DataType>{
   key:string;
-  itemData:any;
+  itemData:DataType;
   currentPosition:Animated.AnimatedValueXY;
 }
-export class DraggableGrid<DataType extends {key:string}> extends React.Component<IDraggableGridProps<DataType>, IDraggableGridState>{
+export class DraggableGrid<DataType extends IBaseItemType> extends React.Component<IDraggableGridProps<DataType>, IDraggableGridState>{
   private panResponder:PanResponderInstance;
   private panResponderCapture:boolean;
   private orderMap:{
     [key:string]:IOrderMapItem
   } = {};
-  private items: IItem[] = [];
+  private items: IItem<DataType>[] = [];
   private blockPositions:IPositionOffset[] = [];
   private activeBlockOffset:IPositionOffset = {x:0, y:0};
   
@@ -115,7 +121,7 @@ export class DraggableGrid<DataType extends {key:string}> extends React.Componen
     
   }
   
-  private removeItem = (item:IItem) => {
+  private removeItem = (item:IItem<DataType>) => {
     const itemIndex = this.orderMap[item.key].itemIndex;
     this.items.splice(itemIndex, 1);
     delete this.orderMap[item.key];
@@ -138,7 +144,7 @@ export class DraggableGrid<DataType extends {key:string}> extends React.Componen
   public render() {
     return (
       <Animated.View
-        style={[styles.draggableGrid]}
+        style={[styles.draggableGrid, this.props.style]}
         onLayout={this.assessGridSize}
       >
         {

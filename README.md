@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
 | renderItem |(item, order:number) => void| yes | Takes an item from data and renders it into the list | |
 | itemHeight | number | no       | if not set this, it will the same as itemWidth | |
 | dragStartAnimation | object | no | custom drag start animation | |
+| style      | object | no       | grid styles |         |
 
 ## Event Props
 
