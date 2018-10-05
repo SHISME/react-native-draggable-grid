@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
 | :--------  | :----  | :------- | :---------- |
 | numColumns | number | yes      | how many items should be render on one row|
 | data       | array  | yes      | data's item must have unique key，item's render will depend on the key|
-| renderItem |(item, order:number) => void| yes | Takes an item from data and renders it into the list |
+| renderItem |(item, order:number) => ReactElement| yes | Takes an item from data and renders it into the list |
 | itemHeight | number | no       | if not set this, it will the same as itemWidth |
 | dragStartAnimation | object | no | custom drag start animation |
 | style      | object | no       | grid styles |
