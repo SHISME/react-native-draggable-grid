@@ -27,7 +27,7 @@ import {
   StyleSheet,
   Text,
 } from 'react-native';
-import { DraggableGrid } from '../DraggableGrid';
+import { DraggableGrid } from 'react-native-draggable-grid';
 
 interface MyTestProps {
 
