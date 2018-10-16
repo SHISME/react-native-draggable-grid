@@ -1,5 +1,6 @@
-# Demo
+# react-native-draggable-grid
 
+## Demo
 [example](https://github.com/SHISME/react-native-draggable-grid-instance)
 
 <p align="center">
@@ -7,9 +8,7 @@
 </p>
 
 
-# react-native-draggable-grid
-
-# Getting Started
+## Getting Started
 
 ## Installation
 
