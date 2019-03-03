@@ -9,7 +9,7 @@ import {
   PanResponderGestureState,
   ViewStyle,
 } from 'react-native';
-import { findKey, differenceBy, forOwn } from 'lodash';
+import { findKey, differenceBy, findIndex } from 'lodash';
 import { Block } from './block';
 
 export interface IOnLayoutEvent {
@@ -45,7 +45,6 @@ interface IPositionOffset {
 }
 interface IOrderMapItem {
   order:number;
-  itemIndex:number;
 }
 interface IItem <DataType>{
   key:string;
@@ -111,7 +110,6 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
     this.blockPositions.push(this.getBlockPositionByOrder(this.items.length));
     this.orderMap[item.key] = {
       order:index,
-      itemIndex:this.items.length,
     };
     this.items.push({
       key:item.key,
@@ -122,8 +120,9 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
   }
   
   private removeItem = (item:IItem<DataType>) => {
-    const itemIndex = this.orderMap[item.key].itemIndex;
+    const itemIndex = findIndex(this.items, (curItem) => curItem.key === item.key);
     this.items.splice(itemIndex, 1);
+    this.blockPositions.pop();
     delete this.orderMap[item.key];
   }
   
@@ -131,7 +130,6 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
     this.items = this.props.data.map((item, index) => {
       this.orderMap[item.key] = {
         order:index,
-        itemIndex:index,
       };
       return {
         key:item.key,
@@ -295,7 +293,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
   private onStartDrag(nativeEvent:GestureResponderEvent, gestureState:PanResponderGestureState) {
     const activeItem = this.getActiveItem();
     if (!activeItem) return false;
-    this.props.onDragStart && this.props.onDragStart(this.items[this.orderMap[activeItem.key].itemIndex].itemData);
+    this.props.onDragStart && this.props.onDragStart(activeItem.itemData);
     const {x0, y0, moveX, moveY} = gestureState;
     const activeOrigin = this.blockPositions[this.orderMap[activeItem.key].order];
     const x = activeOrigin.x - x0;
@@ -373,7 +371,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
   }
   
   private moveBlockToBlockOrderPosition = (itemKey:string) => {
-    const itemIndex = this.orderMap[itemKey].itemIndex;
+    const itemIndex = findIndex(this.items, (item) => item.key === itemKey);
     this.items[itemIndex].currentPosition.flattenOffset();
     Animated.timing(
       this.items[itemIndex].currentPosition,
@@ -393,9 +391,9 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
     if (!activeItem) return false;
     if (this.props.onDragRelease) {
       const dragReleaseResult:DataType[] = [];
-      forOwn(this.orderMap, (item) => {
-        dragReleaseResult[item.order] = this.items[item.itemIndex].itemData;
-      })
+      this.items.forEach((item) => {
+        dragReleaseResult[this.orderMap[item.key].order] = item.itemData;
+      });
       this.props.onDragRelease(dragReleaseResult);
     }
     this.panResponderCapture = false;
