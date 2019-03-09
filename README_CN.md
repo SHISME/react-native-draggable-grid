@@ -1,8 +1,6 @@
 # react-native-draggable-grid
 
-[中文文档](./README_CN.md)
-
-## Demo
+## 例子
 [example](https://github.com/SHISME/react-native-draggable-grid-instance)
 
 <p align="center">
@@ -10,15 +8,15 @@
 </p>
 
 
-## Getting Started
+## 教程
 
-## Installation
+## 安装
 
 ```bash
 npm install react-native-draggable-grid --save
 ```
 
-## Usage
+## 用法
 
 ```javascript
 
@@ -113,27 +111,27 @@ const styles = StyleSheet.create({
 
 ## Props
 
-| parameter  | type   | required | description |
+| 参数名  | 参数类型   | 是否必要 | 描述 |
 | :--------  | :----  | :------- | :---------- |
-| numColumns | number | yes      | how many items should be render on one row|
-| data       | array  | yes      | data's item must have unique key，item's render will depend on the key|
-| renderItem |(item, order:number) => ReactElement| yes | Takes an item from data and renders it into the list |
-| itemHeight | number | no       | if not set this, it will the same as itemWidth |
-| dragStartAnimation | object | no | custom drag start animation |
-| style      | object | no       | grid styles |
+| numColumns | number | yes      | 一行要渲染多少个选项|
+| data       | array  | yes      | 数据必须有唯一的id, 子组件的渲染依赖于这个id|
+| renderItem |(item, order:number) => ReactElement| yes | 渲染子组件|
+| itemHeight | number | no       | 设置子组件高度，如果没有设置，会设置成和动态计算出的 itemWidth 一样大 |
+| dragStartAnimation | object | no | 自定义拖动时启动的动画 |
+| style      | object | no       | 容器的样式 |
 
 ## Event Props
 
 
-| parameter  | type   | required | description |
+| 参数名  | 类型   | 是否必要 | 描述 |
 | :--------  | :----  | :------- | :---------- |
-| onItemPress | (item) => void | no      | Function will execute when item on press |
-| onDragStart | (startDragItem) => void | no | Function will execute when item start drag |
-| onDragRelease | (data) => void | no | Function will execute when item release, and will return the new ordered data |
+| onItemPress | (item) => void | no      | 子组件点击时的回调 |
+| onDragStart | (startDragItem) => void | no | 开始拖动是的回调 |
+| onDragRelease | (data) => void | no | 拖动释放时的回调，会返回排序之后的数据 |
 
-## Custom Drag Start Animation
+## 自定义拖动开始时的动画
 
-If you want to use your custom animation, you can do like this
+如果你想自定义拖动开始时的动画，你可以这样使用
 
 ```javascript
 
@@ -165,8 +163,8 @@ If you want to use your custom animation, you can do like this
 
 ```
 
-## Resort item
+## 通过 props 重新排序
 
-if you want resort item yourself,you only need change the data's sort, and the draggable-grid will auto resort by your data.
+如果你想删除，或者添加，或者重新排序数据，你可以通过修改data来达到目的，组件会根据新的 props.data 来计算出如何排序，删除，添加子组件
 
-> the data's key must unique
+> 需要注意的是，data 中的数据必须要有key，而且必须唯一
