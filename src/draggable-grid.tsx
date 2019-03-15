@@ -9,8 +9,8 @@ import {
   PanResponderGestureState,
   ViewStyle,
 } from 'react-native';
-import { findKey, differenceBy, findIndex } from 'lodash';
 import { Block } from './block';
+import { findKey, findIndex, differenceBy } from './utils';
 
 export interface IOnLayoutEvent {
   nativeEvent: { layout: { x: number; y: number; width: number; height: number } }

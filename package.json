@@ -5,7 +5,7 @@
     "sortable",
     "grid"
   ],
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A draggable grid for react native",
   "main": "built/index.js",
   "types": "src/index.ts",
@@ -24,13 +24,10 @@
     "@types/react-native": "*",
     "react": "*",
     "react-native": "*",
-    "typescript": "^3.0.3",
-    "lodash" : "*",
-    "@types/lodash": "*"
+    "typescript": "^3.0.3"
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*",
-    "lodash":"lodash"
+    "react-native": "*"
   }
 }
