@@ -3,7 +3,6 @@
 [中文文档](./README_CN.md)
 
 ## Demo
-[example](https://github.com/SHISME/react-native-draggable-grid-instance)
 
 <p align="center">
   <img alt="Issue Stats" width="400" src="https://github.com/SHISME/react-native-draggable-grid/blob/master/example.gif?raw=true">
