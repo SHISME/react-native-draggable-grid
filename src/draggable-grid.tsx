@@ -60,7 +60,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
   private items: IItem<DataType>[] = [];
   private blockPositions:IPositionOffset[] = [];
   private activeBlockOffset:IPositionOffset = {x:0, y:0};
-  
+
   public constructor(props:IDraggableGridProps<DataType>) {
     super(props);
     this.panResponderCapture = false;
@@ -88,13 +88,17 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       },
     };
   }
-  
+
   public componentWillReceiveProps(nextProps:IDraggableGridProps<DataType>) {
     nextProps.data.forEach((item, index) => {
       if (this.orderMap[item.key]) {
         if (this.orderMap[item.key].order != index) {
           this.orderMap[item.key].order = index;
           this.moveBlockToBlockOrderPosition(item.key);
+        }
+        const currentItem = this.items.find(i => i.key === item.key);
+        if (currentItem) {
+          currentItem.itemData = item;
         }
       } else {
         this.addItem(item, index);
@@ -105,7 +109,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       this.removeItem(item);
     })
   }
-  
+
   private addItem = (item:DataType, index:number) => {
     this.blockPositions.push(this.getBlockPositionByOrder(this.items.length));
     this.orderMap[item.key] = {
@@ -116,16 +120,16 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       itemData:item,
       currentPosition:new Animated.ValueXY(this.getBlockPositionByOrder(index)),
     });
-    
+
   }
-  
+
   private removeItem = (item:IItem<DataType>) => {
     const itemIndex = findIndex(this.items, (curItem) => curItem.key === item.key);
     this.items.splice(itemIndex, 1);
     this.blockPositions.pop();
     delete this.orderMap[item.key];
   }
-  
+
   public componentWillMount() {
     this.items = this.props.data.map((item, index) => {
       this.orderMap[item.key] = {
@@ -138,7 +142,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       };
     })
   }
-  
+
   public render() {
     return (
       <Animated.View
@@ -166,11 +170,11 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       </Animated.View>
     );
   }
-  
+
   private onBlockPress(itemIndex:number) {
     this.props.onItemPress && this.props.onItemPress(this.items[itemIndex].itemData);
   }
-  
+
   private getBlockStyle = (itemIndex:number) => {
     return [
       {
@@ -185,9 +189,9 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
         left:this.items[itemIndex].currentPosition.getLayout().left,
       },
     ];
-    
+
   }
-  
+
   private setActiveBlock = (itemIndex:number) => {
     this.panResponderCapture = true;
     this.setState({
@@ -196,12 +200,12 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       this.startDragStartAnimation();
     });
   }
-  
+
   private getDragStartAnimation = (itemIndex:number) => {
     if (this.state.activeItemIndex != itemIndex) {
       return;
     }
-    
+
     let dragStartAnimation;
     if (this.props.dragStartAnimation) {
       dragStartAnimation = this.props.dragStartAnimation;
@@ -213,7 +217,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       ...dragStartAnimation,
     };
   }
-  
+
   private getDefaultDragStartAnimation = () => {
     return {
       transform:[
@@ -230,7 +234,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       },
     };
   }
-  
+
   private startDragStartAnimation = () => {
     if (!this.props.dragStartAnimation) {
       this.state.dragStartAnimatedValue.setValue(1);
@@ -240,7 +244,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       }).start();
     }
   }
-  
+
   private getBlockPositionByOrder = (order:number) => {
     if (this.blockPositions[order]) {
       return this.blockPositions[order];
@@ -253,7 +257,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       x,y
     }
   }
-  
+
   private assessGridSize = (event:IOnLayoutEvent) => {
     if (!this.state.hadInitBlockSize) {
       let blockWidth,blockHeight;
@@ -268,7 +272,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       });
     }
   }
-  
+
   private initBlockPositions = () => {
     this.items.forEach((item, index) => {
       this.blockPositions[index] = this.getBlockPositionByOrder(index);
@@ -278,18 +282,18 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
     })
     this.setState({hadInitBlockSize:true});
   }
-  
+
   private getActiveItem = () => {
     if (this.state.activeItemIndex === undefined) return false;
     return this.items[this.state.activeItemIndex];
   }
-  
+
   private getDistance = (startOffset:IPositionOffset, endOffset:IPositionOffset) => {
     const xDistance = startOffset.x + this.activeBlockOffset.x - endOffset.x;
     const yDistance = startOffset.y + this.activeBlockOffset.y - endOffset.y;
     return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
   }
-  
+
   private onStartDrag(nativeEvent:GestureResponderEvent, gestureState:PanResponderGestureState) {
     const activeItem = this.getActiveItem();
     if (!activeItem) return false;
@@ -311,17 +315,17 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       y:moveY,
     })
   }
-  
+
   private onHandMove(nativeEvent:GestureResponderEvent, gestureState:PanResponderGestureState) {
     const activeItem = this.getActiveItem();
     if (!activeItem) return false;
     const {moveX, moveY, x0, y0} = gestureState;
-    
+
     const yChokeAmount = Math.max(0, (this.activeBlockOffset.y + moveY) - (this.state.gridLayout.height - this.state.blockHeight));
     const xChokeAmount = Math.max(0, (this.activeBlockOffset.x + moveX) - (this.state.gridLayout.width - this.state.blockWidth));
     const yMinChokeAmount = Math.min(0, this.activeBlockOffset.y + moveY);
     const xMinChokeAmount = Math.min(0, this.activeBlockOffset.x + moveX);
-    
+
     const dragPosition = {
       x:moveX - xChokeAmount - xMinChokeAmount,
       y:moveY - yChokeAmount - yMinChokeAmount,
@@ -329,10 +333,10 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
     const originPosition = this.blockPositions[this.orderMap[activeItem.key].order];
     const dragPositionToActivePositionDistance = this.getDistance(dragPosition, originPosition);
     activeItem.currentPosition.setValue(dragPosition);
-    
+
     let closetItemIndex = this.state.activeItemIndex as number;
     let closetDistance = dragPositionToActivePositionDistance;
-    
+
     this.items.forEach((item, index) => {
       if (
         index != this.state.activeItemIndex
@@ -353,7 +357,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       this.orderMap[activeItem.key].order = closetOrder;
     }
   }
-  
+
   private resetBlockPositionByOrder = (startOrder:number, endOrder:number) => {
     if (startOrder > endOrder) {
       for (let i = startOrder - 1; i >= endOrder; i--) {
@@ -369,7 +373,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       }
     }
   }
-  
+
   private moveBlockToBlockOrderPosition = (itemKey:string) => {
     const itemIndex = findIndex(this.items, (item) => item.key === itemKey);
     this.items[itemIndex].currentPosition.flattenOffset();
@@ -381,11 +385,11 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       }
     ).start();
   }
-  
+
   private getKeyByOrder = (order:number) => {
     return findKey(this.orderMap, (item:IOrderMapItem) => item.order === order) as string;
   }
-  
+
   private onHandRelease() {
     const activeItem = this.getActiveItem();
     if (!activeItem) return false;
