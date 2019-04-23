@@ -16,7 +16,7 @@ export interface IOnLayoutEvent {
   nativeEvent: { layout: { x: number; y: number; width: number; height: number } }
 };
 
-interface IBaseItemType {
+export interface IBaseItemType {
   key:string;
 }
 
