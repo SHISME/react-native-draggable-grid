@@ -34,6 +34,7 @@ export interface IDraggableGridProps<DataType extends IBaseItemType>{
 export interface IDraggableGridState {
   blockHeight:number;
   blockWidth:number;
+  gridHeight:Animated.Value;
   activeItemIndex?:number;
   gridLayout:{x:number, y:number, width:number, height:number};
   hadInitBlockSize:boolean;
@@ -78,6 +79,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
     this.state = {
       blockHeight:0,
       blockWidth:0,
+      gridHeight:new Animated.Value(0),
       hadInitBlockSize:false,
       dragStartAnimatedValue:new Animated.Value(1),
       gridLayout:{
@@ -89,12 +91,22 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
     };
   }
   
+  private resetGridHeight = () => {
+    const {props} = this;
+    const rowCount = Math.ceil(props.data.length / props.numColumns);
+    this.state.gridHeight.setValue(rowCount * this.state.blockHeight)
+  }
+  
   public componentWillReceiveProps(nextProps:IDraggableGridProps<DataType>) {
     nextProps.data.forEach((item, index) => {
       if (this.orderMap[item.key]) {
         if (this.orderMap[item.key].order != index) {
           this.orderMap[item.key].order = index;
           this.moveBlockToBlockOrderPosition(item.key);
+        }
+        const currentItem = this.items.find(i => i.key === item.key);
+        if (currentItem) {
+          currentItem.itemData = item;
         }
       } else {
         this.addItem(item, index);
@@ -103,7 +115,11 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
     const deleteItems = differenceBy(this.items, nextProps.data, 'key');
     deleteItems.forEach((item) => {
       this.removeItem(item);
-    })
+    });
+  }
+  
+  public componentDidUpdate() {
+    this.resetGridHeight();
   }
   
   private addItem = (item:DataType, index:number) => {
@@ -142,7 +158,13 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
   public render() {
     return (
       <Animated.View
-        style={[styles.draggableGrid, this.props.style]}
+        style={[
+          styles.draggableGrid,
+          this.props.style,
+          {
+            height:this.state.gridHeight,
+          },
+        ]}
         onLayout={this.assessGridSize}
       >
         {
@@ -265,6 +287,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
         gridLayout:event.nativeEvent.layout,
       }, () => {
         this.initBlockPositions();
+        this.resetGridHeight();
       });
     }
   }
@@ -315,16 +338,14 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
   private onHandMove(nativeEvent:GestureResponderEvent, gestureState:PanResponderGestureState) {
     const activeItem = this.getActiveItem();
     if (!activeItem) return false;
-    const {moveX, moveY, x0, y0} = gestureState;
+    const {moveX, moveY } = gestureState;
     
-    const yChokeAmount = Math.max(0, (this.activeBlockOffset.y + moveY) - (this.state.gridLayout.height - this.state.blockHeight));
     const xChokeAmount = Math.max(0, (this.activeBlockOffset.x + moveX) - (this.state.gridLayout.width - this.state.blockWidth));
-    const yMinChokeAmount = Math.min(0, this.activeBlockOffset.y + moveY);
     const xMinChokeAmount = Math.min(0, this.activeBlockOffset.x + moveX);
     
     const dragPosition = {
       x:moveX - xChokeAmount - xMinChokeAmount,
-      y:moveY - yChokeAmount - yMinChokeAmount,
+      y:moveY,
     };
     const originPosition = this.blockPositions[this.orderMap[activeItem.key].order];
     const dragPositionToActivePositionDistance = this.getDistance(dragPosition, originPosition);
