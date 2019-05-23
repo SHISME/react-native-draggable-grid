@@ -3,3 +3,4 @@ node_modules
 built
 demo
 .watchmanconfig
+yarn-error.log
