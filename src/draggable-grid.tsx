@@ -30,6 +30,7 @@ export interface IDraggableGridProps<DataType extends IBaseItemType>{
   onItemPress?:(item:DataType) => void;
   onDragStart?:(item:DataType) => void;
   onDragRelease?:(newSortedData:DataType[]) => void;
+  onResetSort?: (newSortedData: DataType[]) => void
 }
 export interface IDraggableGridState {
   blockHeight:number;
@@ -372,6 +373,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       const closetOrder = this.orderMap[this.items[closetItemIndex].key].order;
       this.resetBlockPositionByOrder(this.orderMap[activeItem.key].order, closetOrder);
       this.orderMap[activeItem.key].order = closetOrder;
+      this.props.onResetSort && this.props.onResetSort(this.getSortData())
     }
   }
   
@@ -407,15 +409,19 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
     return findKey(this.orderMap, (item:IOrderMapItem) => item.order === order) as string;
   }
   
+  private getSortData = () => {
+    const sortData:DataType[] = [];
+    this.items.forEach((item) => {
+      sortData[this.orderMap[item.key].order] = item.itemData;
+    });
+    return sortData
+  }
+  
   private onHandRelease() {
     const activeItem = this.getActiveItem();
     if (!activeItem) return false;
     if (this.props.onDragRelease) {
-      const dragReleaseResult:DataType[] = [];
-      this.items.forEach((item) => {
-        dragReleaseResult[this.orderMap[item.key].order] = item.itemData;
-      });
-      this.props.onDragRelease(dragReleaseResult);
+      this.props.onDragRelease(this.getSortData());
     }
     this.panResponderCapture = false;
     activeItem.currentPosition.flattenOffset();

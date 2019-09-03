@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
 | onItemPress | (item) => void | no      | Function will execute when item on press |
 | onDragStart | (startDragItem) => void | no | Function will execute when item start drag |
 | onDragRelease | (data) => void | no | Function will execute when item release, and will return the new ordered data |
+| onResetSort | (data) => void | no | Function will execute when dragged item change sort |
 
 ## Custom Drag Start Animation
 
