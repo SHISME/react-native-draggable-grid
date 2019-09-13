@@ -15,15 +15,39 @@
   },
   "scripts": {
     "built": "rm -rf built && tsc",
-    "watch": "tsc -w --outDir demo/built"
+    "watch": "tsc -w --outDir demo/built",
+    "test": "jest"
+  },
+  "jest": {
+    "verbose": true,
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/"
+    ],
+    "transform": {
+      "^.+\\.(js)$": "<rootDir>/node_modules/babel-jest",
+      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testMatch": [
+      "<rootDir>/test/**/?(*.)(spec|test).ts?(x)"
+    ]
   },
   "author": "shisme",
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^24.0.18",
     "@types/react": "*",
     "@types/react-native": "*",
+    "jest": "^24.9.0",
     "react": "*",
     "react-native": "*",
+    "babel-jest": "^24.9.0",
+    "jest-react-native": "^18.0.0",
+    "ts-jest": "^24.0.2",
     "typescript": "^3.0.3"
   },
   "peerDependencies": {
