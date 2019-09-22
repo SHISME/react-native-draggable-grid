@@ -36,20 +36,23 @@
       "<rootDir>/test/**/?(*.)(spec|test).ts?(x)"
     ]
   },
-  "pre-commit": [ "test" ],
+  "pre-commit": [
+    "test"
+  ],
   "author": "shisme",
   "license": "ISC",
   "devDependencies": {
-    "pre-commit": "^1.2.2",
     "@types/jest": "^24.0.18",
     "@types/react": "*",
     "@types/react-native": "*",
     "babel-jest": "^24.9.0",
     "jest": "^24.9.0",
     "jest-react-native": "^18.0.0",
+    "pre-commit": "^1.2.2",
     "react": "*",
     "react-native": "*",
     "ts-jest": "^24.0.2",
+    "prettier": "^1.18.2",
     "typescript": "^3.0.3"
   },
   "peerDependencies": {
