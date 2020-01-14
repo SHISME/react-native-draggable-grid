@@ -130,6 +130,20 @@ const styles = StyleSheet.create({
 | onDragRelease | (data) => void | no | 拖动释放时的回调，会返回排序之后的数据 |
 | onResetSort | (data) => void | no | 拖动时重新排序的回调，会返回排序后的数据 |
 
+## Item Props
+
+| parameter  | type   | required | description |
+| :--------  | :----  | :------- | :---------- |
+| disabledDrag | boolean | no      | 禁止选项拖动 |
+| disabledResorted | boolean | no | 禁止选项被重新排序 |
+
+设置 `disabledResorted` 为 `true`, 那么那个选项拖动时排序的时候就会被忽略
+
+<p align="center">
+  <img alt="Issue Stats" width="400" src="https://github.com/SHISME/react-native-draggable-grid/blob/master/example2.gif?raw=true">
+</p>
+
+
 ## 自定义拖动开始时的动画
 
 如果你想自定义拖动开始时的动画，你可以这样使用
