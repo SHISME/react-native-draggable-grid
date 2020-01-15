@@ -1,3 +1,5 @@
+/** @format */
+
 import * as React from 'react'
 import {
   Animated,
@@ -21,7 +23,7 @@ export class Block extends React.Component<BlockProps> {
       <Animated.View
         style={[styles.blockContainer, this.props.style, this.props.dragStartAnimationStyle]}
         {...this.props.panHandlers}>
-        <Animated.View>
+        <Animated.View style={{ width: '100%' }}>
           <TouchableWithoutFeedback
             onPress={this.props.onPress}
             onLongPress={this.props.onLongPress}>
@@ -36,5 +38,6 @@ export class Block extends React.Component<BlockProps> {
 const styles = StyleSheet.create({
   blockContainer: {
     alignItems: 'center',
+    width: '100%',
   },
 })

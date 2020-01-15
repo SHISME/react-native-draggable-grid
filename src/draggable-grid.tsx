@@ -1,3 +1,5 @@
+/** @format */
+
 import * as React from 'react'
 import {
   PanResponderInstance,
@@ -101,7 +103,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
     this.state.gridHeight.setValue(rowCount * this.state.blockHeight)
   }
 
-  public componentWillReceiveProps(nextProps: IDraggableGridProps<DataType>) {
+  public UNSAFE_componentWillReceiveProps(nextProps: IDraggableGridProps<DataType>) {
     nextProps.data.forEach((item, index) => {
       if (this.orderMap[item.key]) {
         if (this.orderMap[item.key].order != index) {
@@ -145,7 +147,7 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
     delete this.orderMap[item.key]
   }
 
-  public componentWillMount() {
+  public UNSAFE_componentWillMount() {
     this.items = this.props.data.map((item, index) => {
       this.orderMap[item.key] = {
         order: index,
@@ -278,6 +280,10 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
   }
 
   private assessGridSize = (event: IOnLayoutEvent) => {
+    if (this.state.blockWidth != event.nativeEvent.layout.width) {
+      this.setState({ blockWidth: event.nativeEvent.layout.width })
+    }
+
     if (!this.state.hadInitBlockSize) {
       let blockWidth, blockHeight
       blockWidth = event.nativeEvent.layout.width / this.props.numColumns
@@ -438,7 +444,6 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
 
 const styles = StyleSheet.create({
   draggableGrid: {
-    flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
