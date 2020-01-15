@@ -5,9 +5,9 @@
     "sortable",
     "grid"
   ],
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A draggable grid for react native",
-  "main": "built/index.js",
+  "main": "built/src/index.js",
   "types": "src/index.ts",
   "repository": {
     "type": "git",
