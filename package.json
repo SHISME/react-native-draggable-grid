@@ -19,6 +19,7 @@
     "test": "jest"
   },
   "jest": {
+    "preset": "react-native",
     "verbose": true,
     "moduleFileExtensions": [
       "ts",
@@ -29,8 +30,7 @@
       "<rootDir>/node_modules/"
     ],
     "transform": {
-      "^.+\\.(js)$": "<rootDir>/node_modules/babel-jest",
-      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      "\\.(ts|tsx)$": "<rootDir>/node_modules/babel-jest"
     },
     "testMatch": [
       "<rootDir>/test/**/?(*.)(spec|test).ts?(x)"
@@ -42,17 +42,24 @@
   "author": "shisme",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/preset-react": "^7.8.3",
+    "@babel/preset-typescript": "^7.8.3",
     "@types/jest": "^24.0.18",
     "@types/react": "*",
     "@types/react-native": "*",
+    "@types/react-test-renderer": "^16.9.2",
     "babel-jest": "^24.9.0",
+    "babel-preset-react-native": "^4.0.1",
     "jest": "^24.9.0",
     "jest-react-native": "^18.0.0",
     "pre-commit": "^1.2.2",
-    "react": "*",
-    "react-native": "*",
-    "ts-jest": "^24.0.2",
     "prettier": "^1.18.2",
+    "react": "*",
+    "react-native": "^0.60.0",
+    "react-test-renderer": "^16.12.0",
+    "ts-jest": "^24.0.2",
     "typescript": "^3.0.3"
   },
   "peerDependencies": {

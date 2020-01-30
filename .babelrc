@@ -1,7 +1,0 @@
-{
-  "presets": [
-    "react-native"
-  ],
-  "retainLines": true,
-  "sourceMaps": true
-}
