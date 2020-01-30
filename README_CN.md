@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
 | parameter  | type   | required | description |
 | :--------  | :----  | :------- | :---------- |
 | disabledDrag | boolean | no      | 禁止选项拖动 |
-| disabledResorted | boolean | no | 禁止选项被重新排序 |
+| disabledReSorted | boolean | no | 禁止选项被重新排序 |
 
 设置 `disabledResorted` 为 `true`, 那么那个选项拖动时排序的时候就会被忽略
 

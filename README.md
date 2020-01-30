@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
 | parameter  | type   | required | description |
 | :--------  | :----  | :------- | :---------- |
 | disabledDrag | boolean | no      | It will disable drag for the item |
-| disabledResorted | boolean | no | It will disable resort the item |
+| disabledReSorted | boolean | no | It will disable resort the item |
 
 if you set disabledResorted be true, it will look like that
 
