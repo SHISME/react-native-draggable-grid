@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { DraggableGrid } from '../src/draggable-grid';
-import { Block } from '../src/block';
 import { create } from 'react-test-renderer';
 import { View, Text } from 'react-native';
 
@@ -34,7 +33,7 @@ describe('draggable-grid', () => {
   it('items 初始化正确', () => {
     expect(draggableInstance.items.length).toBe(data.length);
   })
-  it ('更新正确', () => {
+  it ('新增', () => {
     draggableGridRender.update(
       <DraggableGrid
         data={data2}
@@ -43,7 +42,6 @@ describe('draggable-grid', () => {
           return <View><Text>1111</Text></View>}
         }/>
     );
-    console.log('find', draggableGridRender.root.findByType(View).findAllByType(Block));
     expect(draggableInstance.items.length).toBe(data2.length);
   })
 })
