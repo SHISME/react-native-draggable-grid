@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import { Block } from './block'
 import { findKey, findIndex, differenceBy } from './utils'
+import { useState, useEffect } from 'react'
 
 export interface IOnLayoutEvent {
   nativeEvent: { layout: { x: number; y: number; width: number; height: number } }
@@ -459,6 +460,360 @@ export class DraggableGrid<DataType extends IBaseItemType> extends React.Compone
       activeItemIndex: undefined,
     })
   }
+}
+
+
+
+export const DraggableGrid2 = function<DataType extends IBaseItemType>({style, renderItem, itemHeight, numColumns, data, onItemPress, onDragRelease, dragStartAnimation, onDragStart, onResetSort}: IDraggableGridProps<DataType>){
+  
+  const [ blockHeight, setBlockHeight ] = useState(0);
+  const [ blockWidth, setBlockWidth ] = useState(0);
+  const [ gridHeight, setGridHeight ] = useState(new Animated.Value(0));
+  const [ hadInitBlockSize, setHadInitBlockSize ] = useState(false);
+  const [ dragStartAnimatedValue, setDragStartAnimatedValue ] = useState(new Animated.Value(1));
+  const [ gridLayout, setGridLayout ] = useState({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+  });
+  const [ activeItemIndex, setActiveItemIndex ] = useState<undefined | number>()
+
+  const assessGridSize = (event: IOnLayoutEvent) => {
+    if (!hadInitBlockSize) {
+      let blockWidth, blockHeight
+      blockWidth = event.nativeEvent.layout.width / numColumns
+      blockHeight = itemHeight || blockWidth
+      setBlockWidth(blockWidth);
+      setBlockHeight(blockHeight);
+      setGridLayout(event.nativeEvent.layout);
+    }
+  }
+  
+  let panResponderCapture = false
+  const panResponder = PanResponder.create({
+     onStartShouldSetPanResponder: () => true,
+     onStartShouldSetPanResponderCapture: () => false,
+     onMoveShouldSetPanResponder: () => panResponderCapture,
+     onMoveShouldSetPanResponderCapture: () => panResponderCapture,
+     onShouldBlockNativeResponder: () => false,
+     onPanResponderTerminationRequest: () => false,
+     onPanResponderGrant: onStartDrag,
+     onPanResponderMove: onHandMove,
+     onPanResponderRelease: onHandRelease,
+   });
+  const orderMap: {
+    [itemKey: string]: IOrderMapItem
+  } = {}
+  const items: IItem<DataType>[] = []
+  const itemMap: {
+    [itemKey: string]: DataType
+  } = {}
+  const blockPositions: IPositionOffset[] = []
+  let activeBlockOffset: IPositionOffset = { x: 0, y: 0 }
+  
+  
+  function initBlockPositions(){
+    items.forEach((item, index) => {
+      blockPositions[index] = getBlockPositionByOrder(index)
+    })
+    items.forEach(item => {
+      item.currentPosition.setOffset(blockPositions[orderMap[item.key].order])
+    })
+    setHadInitBlockSize(true)
+  }
+  function getBlockPositionByOrder(order: number){
+    if (blockPositions[order]) {
+      return blockPositions[order]
+    }
+    const columnOnRow = order % numColumns
+    const y = blockHeight * Math.floor(order / numColumns)
+    const x = columnOnRow * blockWidth
+    return {
+      x,
+      y,
+    }
+  }
+  function resetGridHeight (){
+    const rowCount = Math.ceil(data.length / numColumns)
+    gridHeight.setValue(rowCount * blockHeight)
+  }
+  function onBlockPress(itemIndex: number) {
+    onItemPress && onItemPress(items[itemIndex].itemData)
+  }
+  function onStartDrag(nativeEvent: GestureResponderEvent, gestureState: PanResponderGestureState) {
+    const activeItem = getActiveItem()
+    if (!activeItem) return false
+    onDragStart && onDragStart(activeItem.itemData)
+    const { x0, y0, moveX, moveY } = gestureState
+    const activeOrigin = blockPositions[orderMap[activeItem.key].order]
+    const x = activeOrigin.x - x0
+    const y = activeOrigin.y - y0
+    activeItem.currentPosition.setOffset({
+      x,
+      y,
+    })
+    activeBlockOffset = {
+      x,
+      y,
+    }
+    activeItem.currentPosition.setValue({
+      x: moveX,
+      y: moveY,
+    })
+  }
+  function onHandMove(nativeEvent: GestureResponderEvent, gestureState: PanResponderGestureState) {
+    const activeItem = getActiveItem()
+    if (!activeItem) return false
+    const { moveX, moveY } = gestureState
+  
+    const xChokeAmount = Math.max(
+      0,
+      activeBlockOffset.x + moveX - (gridLayout.width - blockWidth),
+    )
+    const xMinChokeAmount = Math.min(0, activeBlockOffset.x + moveX)
+  
+    const dragPosition = {
+      x: moveX - xChokeAmount - xMinChokeAmount,
+      y: moveY,
+    }
+    const originPosition = blockPositions[orderMap[activeItem.key].order]
+    const dragPositionToActivePositionDistance = getDistance(dragPosition, originPosition)
+    activeItem.currentPosition.setValue(dragPosition)
+  
+    let closetItemIndex = activeItemIndex as number
+    let closetDistance = dragPositionToActivePositionDistance
+  
+    items.forEach((item, index) => {
+      if (item.itemData.disabledReSorted) return
+      if (index != activeItemIndex) {
+        const dragPositionToItemPositionDistance = getDistance(
+          dragPosition,
+          blockPositions[orderMap[item.key].order],
+        )
+        if (
+          dragPositionToItemPositionDistance < closetDistance &&
+          dragPositionToItemPositionDistance < blockWidth
+        ) {
+          closetItemIndex = index
+          closetDistance = dragPositionToItemPositionDistance
+        }
+      }
+    })
+    if (activeItemIndex != closetItemIndex) {
+      const closetOrder = orderMap[items[closetItemIndex].key].order
+      resetBlockPositionByOrder(orderMap[activeItem.key].order, closetOrder)
+      orderMap[activeItem.key].order = closetOrder
+      onResetSort && onResetSort(getSortData())
+    }
+  }
+  function onHandRelease() {
+    const activeItem = getActiveItem()
+    if (!activeItem) return false
+    if (onDragRelease) {
+      onDragRelease(getSortData())
+    }
+    panResponderCapture = false
+    activeItem.currentPosition.flattenOffset()
+    moveBlockToBlockOrderPosition(activeItem.key)
+    setActiveItemIndex(undefined)
+  }
+  function resetBlockPositionByOrder(activeItemOrder: number, insertedPositionOrder: number){
+    let disabledReSortedItemCount = 0
+    if (activeItemOrder > insertedPositionOrder) {
+      for (let i = activeItemOrder - 1; i >= insertedPositionOrder; i--) {
+        const key = getKeyByOrder(i)
+        const item = itemMap[key]
+        if (item && item.disabledReSorted) {
+          disabledReSortedItemCount ++
+        } else {
+          orderMap[key].order += disabledReSortedItemCount + 1;
+          disabledReSortedItemCount = 0
+          moveBlockToBlockOrderPosition(key)
+        }
+      }
+    } else {
+      for (let i = activeItemOrder + 1; i <= insertedPositionOrder; i++) {
+        const key = getKeyByOrder(i)
+        const item = itemMap[key]
+        if (item && item.disabledReSorted) {
+          disabledReSortedItemCount ++
+        } else {
+          orderMap[key].order -= disabledReSortedItemCount + 1
+          disabledReSortedItemCount = 0
+          moveBlockToBlockOrderPosition(key)
+        }
+        
+      }
+    }
+  }
+  function moveBlockToBlockOrderPosition(itemKey: string){
+    const itemIndex = findIndex(items, item => item.key === itemKey)
+    items[itemIndex].currentPosition.flattenOffset()
+    Animated.timing(items[itemIndex].currentPosition, {
+      toValue: blockPositions[orderMap[itemKey].order],
+      duration: 200,
+    }).start()
+  }
+  function getKeyByOrder(order: number){
+    return findKey(orderMap, (item: IOrderMapItem) => item.order === order) as string
+  }
+
+  function getSortData(){
+    const sortData: DataType[] = []
+    items.forEach(item => {
+      sortData[orderMap[item.key].order] = item.itemData
+    })
+    return sortData
+  }
+  function getDistance(startOffset: IPositionOffset, endOffset: IPositionOffset){
+    const xDistance = startOffset.x + activeBlockOffset.x - endOffset.x
+    const yDistance = startOffset.y + activeBlockOffset.y - endOffset.y
+    return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2))
+  }
+  function setActiveBlock(itemIndex: number, item: DataType){
+    if (item.disabledDrag) return
+    
+    panResponderCapture = true
+    setActiveItemIndex(itemIndex);
+  }
+  function startDragStartAnimation() {
+    if (!dragStartAnimation) {
+      dragStartAnimatedValue.setValue(1)
+      Animated.timing(dragStartAnimatedValue, {
+        toValue: 1.1,
+        duration: 100,
+      }).start()
+    }
+  }
+  function getBlockStyle(itemIndex: number){
+    return [
+      {
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      hadInitBlockSize && {
+        width: blockWidth,
+        height: blockHeight,
+        position: 'absolute',
+        top: items[itemIndex].currentPosition.getLayout().top,
+        left: items[itemIndex].currentPosition.getLayout().left,
+      },
+    ]
+  }
+  function getDragStartAnimation(itemIndex: number){
+    if (activeItemIndex != itemIndex) {
+      return
+    }
+    
+    let dragStartAnimation
+    if (dragStartAnimation) {
+      dragStartAnimation = dragStartAnimation
+    } else {
+      dragStartAnimation = getDefaultDragStartAnimation()
+    }
+    return {
+      zIndex: 3,
+      ...dragStartAnimation,
+    }
+  }
+  function getActiveItem(){
+    if (activeItemIndex === undefined) return false
+    return items[activeItemIndex]
+  }
+  function getDefaultDragStartAnimation(){
+    return {
+      transform: [
+        {
+          scale: dragStartAnimatedValue,
+        },
+      ],
+      shadowColor: '#000000',
+      shadowOpacity: 0.2,
+      shadowRadius: 6,
+      shadowOffset: {
+        width: 1,
+        height: 1,
+      },
+    }
+  }
+  function addItem(item: DataType, index: number){
+    blockPositions.push(getBlockPositionByOrder(items.length))
+    orderMap[item.key] = {
+      order: index,
+    }
+    itemMap[item.key] = item
+    items.push({
+      key: item.key,
+      itemData: item,
+      currentPosition: new Animated.ValueXY(getBlockPositionByOrder(index)),
+    })
+  }
+
+  function removeItem(item: IItem<DataType>){
+    const itemIndex = findIndex(items, curItem => curItem.key === item.key)
+    items.splice(itemIndex, 1)
+    blockPositions.pop()
+    delete orderMap[item.key]
+  }
+  useEffect(() => {
+    startDragStartAnimation()
+  }, [activeItemIndex])
+  useEffect(() => {
+    initBlockPositions()
+  }, [gridLayout])
+  useEffect(() => {
+    data.forEach((item, index) => {
+      if (orderMap[item.key]) {
+        if (orderMap[item.key].order != index) {
+          orderMap[item.key].order = index
+          moveBlockToBlockOrderPosition(item.key)
+        }
+        const currentItem = items.find(i => i.key === item.key)
+        if (currentItem) {
+          currentItem.itemData = item
+        }
+        itemMap[item.key] = item
+      } else {
+        addItem(item, index)
+      }
+    })
+    const deleteItems = differenceBy(items, data, 'key')
+    deleteItems.forEach(item => {
+      removeItem(item)
+    })
+  }, [data])
+  useEffect(() => {
+    resetGridHeight()
+  })
+  return (
+    <Animated.View
+      style={[
+        styles.draggableGrid,
+        style,
+        {
+          height: gridHeight,
+        },
+      ]}
+      onLayout={assessGridSize}>
+      {
+        hadInitBlockSize &&
+        items.map((item, itemIndex) => {
+          return (
+            <Block
+              onPress={onBlockPress.bind(null, itemIndex)}
+              onLongPress={setActiveBlock.bind(null, itemIndex, item.itemData)}
+              panHandlers={panResponder.panHandlers}
+              style={getBlockStyle(itemIndex)}
+              dragStartAnimationStyle={getDragStartAnimation(itemIndex)}
+              key={item.key}>
+              {renderItem(item.itemData, orderMap[item.key].order)}
+            </Block>
+          )
+        })
+      }
+    </Animated.View>
+  );
 }
 
 const styles = StyleSheet.create({
