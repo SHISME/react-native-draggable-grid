@@ -74,6 +74,9 @@ export class MyTest extends React.Component<MyTestProps, MyTestState>{
           numColumns={4}
           renderItem={this.render_item}
           data={this.state.data}
+          onDragRelease={(data) => {
+            this.setState({data});// 因为使用了 hooks 的缘故，每次释放时会重新render，render会触发检查props和draggble grid缓存的排序的差异，并且使用props的顺序，所以需要每次释放的时候重新设置props的顺序
+          }}
         />
       </View>
     );

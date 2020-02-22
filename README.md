@@ -78,6 +78,9 @@ export class MyTest extends React.Component<MyTestProps, MyTestState>{
           numColumns={4}
           renderItem={this.render_item}
           data={this.state.data}
+          onDragRelease={(data) => {
+            this.setState({data});// need reset the props data sort after drag release
+          }}
         />
       </View>
     );
