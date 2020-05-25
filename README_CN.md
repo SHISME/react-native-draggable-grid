@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
 | onDragStart | (startDragItem) => void | no | 开始拖动是的回调 |
 | onDragRelease | (data) => void | no | 拖动释放时的回调，会返回排序之后的数据 |
 | onResetSort | (data) => void | no | 拖动时重新排序的回调，会返回排序后的数据 |
+| onDragging | (gestureState: PanResponderGestureState) => void| no | 拖动时的回调函数，返回拖动的组件的位置 |
 
 ## Item Props
 
