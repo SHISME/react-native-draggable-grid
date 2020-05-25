@@ -31,8 +31,12 @@ export interface IDraggableGridProps<DataType extends IBaseItemType> {
   dragStartAnimation?: StyleProp<any>
   onItemPress?: (item: DataType) => void
   onDragStart?: (item: DataType) => void
+  onDragging?: (gestureState: PanResponderGestureState) => void
   onDragRelease?: (newSortedData: DataType[]) => void
   onResetSort?: (newSortedData: DataType[]) => void
+}
+interface IMap<T> {
+  [key:string]: T
 }
 interface IPositionOffset {
   x: number
@@ -47,18 +51,14 @@ interface IItem<DataType> {
   currentPosition: Animated.AnimatedValueXY
 }
 let activeBlockOffset = { x: 0, y: 0 }
-const blockPositions: IPositionOffset[] = []
-const orderMap: {
-  [itemKey: string]: IOrderMapItem
-} = {}
-const itemMap: {
-  [itemKey: string]: any
-} = {}
-const items: IItem<any>[] = []
 
 export const DraggableGrid = function<DataType extends IBaseItemType>(
   props: IDraggableGridProps<DataType>,
 ) {
+  const [blockPositions] = useState<IPositionOffset[]>([])
+  const [orderMap] = useState<IMap<IOrderMapItem>>({})
+  const [itemMap] = useState<IMap<DataType>>({})
+  const [items] = useState<IItem<DataType>[]>([])
   const [blockHeight, setBlockHeight] = useState(0)
   const [blockWidth, setBlockWidth] = useState(0)
   const [gridHeight] = useState<Animated.Value>(new Animated.Value(0))
@@ -145,6 +145,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
     const activeItem = getActiveItem()
     if (!activeItem) return false
     const { moveX, moveY } = gestureState
+    props.onDragging && props.onDragging(gestureState)
 
     const xChokeAmount = Math.max(0, activeBlockOffset.x + moveX - (gridLayout.width - blockWidth))
     const xMinChokeAmount = Math.min(0, activeBlockOffset.x + moveX)
@@ -226,6 +227,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
     Animated.timing(items[itemIndex].currentPosition, {
       toValue: blockPositions[orderMap[itemKey].order],
       duration: 200,
+      useNativeDriver: false
     }).start()
   }
   function getKeyByOrder(order: number) {
@@ -256,6 +258,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
       Animated.timing(dragStartAnimatedValue, {
         toValue: 1.1,
         duration: 100,
+        useNativeDriver: false
       }).start()
     }
   }
