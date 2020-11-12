@@ -119,7 +119,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
   function onBlockPress(itemIndex: number) {
     props.onItemPress && props.onItemPress(items[itemIndex].itemData)
   }
-  function onStartDrag(_, gestureState: PanResponderGestureState) {
+  function onStartDrag(_: any, gestureState: PanResponderGestureState) {
     const activeItem = getActiveItem()
     if (!activeItem) return false
     props.onDragStart && props.onDragStart(activeItem.itemData)
@@ -140,7 +140,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
       y: moveY,
     })
   }
-  function onHandMove(_, gestureState: PanResponderGestureState) {
+  function onHandMove(_: any, gestureState: PanResponderGestureState) {
     const activeItem = getActiveItem()
     if (!activeItem) return false
     const { moveX, moveY } = gestureState
