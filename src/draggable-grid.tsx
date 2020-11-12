@@ -5,7 +5,6 @@ import {
   Animated,
   StyleSheet,
   StyleProp,
-  GestureResponderEvent,
   PanResponderGestureState,
   ViewStyle,
 } from 'react-native'
@@ -97,7 +96,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
   })
 
   function initBlockPositions() {
-    items.forEach((item, index) => {
+    items.forEach((_, index) => {
       blockPositions[index] = getBlockPositionByOrder(index)
     })
   }
@@ -120,7 +119,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
   function onBlockPress(itemIndex: number) {
     props.onItemPress && props.onItemPress(items[itemIndex].itemData)
   }
-  function onStartDrag(nativeEvent: GestureResponderEvent, gestureState: PanResponderGestureState) {
+  function onStartDrag(_, gestureState: PanResponderGestureState) {
     const activeItem = getActiveItem()
     if (!activeItem) return false
     props.onDragStart && props.onDragStart(activeItem.itemData)
@@ -141,7 +140,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
       y: moveY,
     })
   }
-  function onHandMove(nativeEvent: GestureResponderEvent, gestureState: PanResponderGestureState) {
+  function onHandMove(_, gestureState: PanResponderGestureState) {
     const activeItem = getActiveItem()
     if (!activeItem) return false
     const { moveX, moveY } = gestureState
