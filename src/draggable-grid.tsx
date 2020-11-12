@@ -5,6 +5,7 @@ import {
   Animated,
   StyleSheet,
   StyleProp,
+  GestureResponderEvent,
   PanResponderGestureState,
   ViewStyle,
 } from 'react-native'
@@ -119,7 +120,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
   function onBlockPress(itemIndex: number) {
     props.onItemPress && props.onItemPress(items[itemIndex].itemData)
   }
-  function onStartDrag(_: any, gestureState: PanResponderGestureState) {
+  function onStartDrag(_: GestureResponderEvent, gestureState: PanResponderGestureState) {
     const activeItem = getActiveItem()
     if (!activeItem) return false
     props.onDragStart && props.onDragStart(activeItem.itemData)
@@ -140,7 +141,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
       y: moveY,
     })
   }
-  function onHandMove(_: any, gestureState: PanResponderGestureState) {
+  function onHandMove(_: GestureResponderEvent, gestureState: PanResponderGestureState) {
     const activeItem = getActiveItem()
     if (!activeItem) return false
     const { moveX, moveY } = gestureState
