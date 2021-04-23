@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
 | itemHeight | number | no       | if not set this, it will the same as itemWidth |
 | dragStartAnimation | object | no | custom drag start animation |
 | style      | object | no       | grid styles |
+| readonly      | boolean | no       | It will disable drag for all items |
 
 ## Event Props
 

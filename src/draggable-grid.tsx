@@ -34,6 +34,7 @@ export interface IDraggableGridProps<DataType extends IBaseItemType> {
   onDragging?: (gestureState: PanResponderGestureState) => void
   onDragRelease?: (newSortedData: DataType[]) => void
   onResetSort?: (newSortedData: DataType[]) => void
+  readonly?: boolean
 }
 interface IMap<T> {
   [key:string]: T
@@ -97,7 +98,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
   })
 
   function initBlockPositions() {
-    items.forEach((_, index) => {
+    items.forEach((item, index) => {
       blockPositions[index] = getBlockPositionByOrder(index)
     })
   }
@@ -120,7 +121,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
   function onBlockPress(itemIndex: number) {
     props.onItemPress && props.onItemPress(items[itemIndex].itemData)
   }
-  function onStartDrag(_: GestureResponderEvent, gestureState: PanResponderGestureState) {
+  function onStartDrag(nativeEvent: GestureResponderEvent, gestureState: PanResponderGestureState) {
     const activeItem = getActiveItem()
     if (!activeItem) return false
     props.onDragStart && props.onDragStart(activeItem.itemData)
@@ -141,7 +142,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
       y: moveY,
     })
   }
-  function onHandMove(_: GestureResponderEvent, gestureState: PanResponderGestureState) {
+  function onHandMove(nativeEvent: GestureResponderEvent, gestureState: PanResponderGestureState) {
     const activeItem = getActiveItem()
     if (!activeItem) return false
     const { moveX, moveY } = gestureState
@@ -247,6 +248,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
     return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2))
   }
   function setActiveBlock(itemIndex: number, item: DataType) {
+    if (props.readonly) return
     if (item.disabledDrag) return
 
     setPanResponderCapture(true)
