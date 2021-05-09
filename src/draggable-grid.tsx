@@ -17,7 +17,7 @@ export interface IOnLayoutEvent {
 }
 
 interface IBaseItemType {
-  key: string
+  key: string | number
   disabledDrag?: boolean
   disabledReSorted?: boolean
 }
@@ -36,7 +36,7 @@ export interface IDraggableGridProps<DataType extends IBaseItemType> {
   onResetSort?: (newSortedData: DataType[]) => void
 }
 interface IMap<T> {
-  [key:string]: T
+  [key: string]: T
 }
 interface IPositionOffset {
   x: number
@@ -46,7 +46,7 @@ interface IOrderMapItem {
   order: number
 }
 interface IItem<DataType> {
-  key: string
+  key: string | number
   itemData: DataType
   currentPosition: Animated.AnimatedValueXY
 }
@@ -221,13 +221,13 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
       }
     }
   }
-  function moveBlockToBlockOrderPosition(itemKey: string) {
-    const itemIndex = findIndex(items, item => item.key === itemKey)
+  function moveBlockToBlockOrderPosition(itemKey: string | number) {
+    const itemIndex = findIndex(items, item => `${item.key}` === `${itemKey}`)
     items[itemIndex].currentPosition.flattenOffset()
     Animated.timing(items[itemIndex].currentPosition, {
       toValue: blockPositions[orderMap[itemKey].order],
       duration: 200,
-      useNativeDriver: false
+      useNativeDriver: false,
     }).start()
   }
   function getKeyByOrder(order: number) {
@@ -258,7 +258,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
       Animated.timing(dragStartAnimatedValue, {
         toValue: 1.1,
         duration: 100,
-        useNativeDriver: false
+        useNativeDriver: false,
       }).start()
     }
   }
