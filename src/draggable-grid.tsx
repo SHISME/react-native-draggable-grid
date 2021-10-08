@@ -34,6 +34,7 @@ export interface IDraggableGridProps<DataType extends IBaseItemType> {
   onDragging?: (gestureState: PanResponderGestureState) => void
   onDragRelease?: (newSortedData: DataType[]) => void
   onResetSort?: (newSortedData: DataType[]) => void
+  delayLongPress?:number
 }
 interface IMap<T> {
   [key: string]: T
@@ -370,6 +371,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
         panHandlers={panResponder.panHandlers}
         style={getBlockStyle(itemIndex)}
         dragStartAnimationStyle={getDragStartAnimation(itemIndex)}
+        delayLongPress={props.delayLongPress || 300}
         key={item.key}>
         {props.renderItem(item.itemData, orderMap[item.key].order)}
       </Block>
