@@ -53,7 +53,7 @@
     "react-native": "*",
     "ts-jest": "^24.0.2",
     "prettier": "^1.18.2",
-    "typescript": "^3.0.3"
+    "typescript": "^3.8.0"
   },
   "peerDependencies": {
     "react": "^16.0.0",
