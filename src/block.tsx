@@ -17,6 +17,7 @@ interface BlockProps {
   onLongPress: () => void
   panHandlers: GestureResponderHandlers
   delayLongPress:number
+  children?:React.ReactNode
 }
 
 export const Block: FunctionComponent<BlockProps> = ({
