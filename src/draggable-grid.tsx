@@ -31,6 +31,7 @@ export interface IDraggableGridProps<DataType extends IBaseItemType> {
   dragStartAnimation?: StyleProp<any>
   onItemPress?: (item: DataType) => void
   onDragStart?: (item: DataType) => void
+  onDragWillStart?: () => void
   onDragging?: (gestureState: PanResponderGestureState) => void
   onDragRelease?: (newSortedData: DataType[]) => void
   onResetSort?: (newSortedData: DataType[]) => void
@@ -247,11 +248,17 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
     const yDistance = startOffset.y + activeBlockOffset.y - endOffset.y
     return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2))
   }
-  function setActiveBlock(itemIndex: number, item: DataType) {
-    if (item.disabledDrag) return
-
-    setPanResponderCapture(true)
-    setActiveItemIndex(itemIndex)
+  function setActiveBlock(itemIndex: number, item: YourItemType): void {
+    if (item.disabledDrag) return;
+  
+    setPanResponderCapture(true);
+  
+    if (props.onDragWillStart) {
+      props.onDragWillStart();
+    }
+  
+    setActiveItemIndex(itemIndex);
+  
   }
   function startDragStartAnimation() {
     if (!props.dragStartAnimation) {
