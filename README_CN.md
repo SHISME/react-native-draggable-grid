@@ -126,14 +126,14 @@ const styles = StyleSheet.create({
 ## Event Props
 
 
-| 参数名  | 类型   | 是否必要 | 描述 |
-| :--------  | :----  | :------- | :---------- |
-| onItemPress | (item) => void | no      | 子组件点击时的回调 |
-| onDragStart | (startDragItem) => void | no | 开始拖动是的回调 |
-| onDragRelease | (data) => void | no | 拖动释放时的回调，会返回排序之后的数据 |
-| onResetSort | (data) => void | no | 拖动时重新排序的回调，会返回排序后的数据 |
-| onDragging | (gestureState: PanResponderGestureState) => void| no | 拖动时的回调函数，返回拖动的组件的位置 |
-
+| 参数名              | 类型                                               | 是否必要 | 描述                   |
+|:-----------------|:-------------------------------------------------| :------- |:---------------------|
+| onItemPress      | (item) => void                                   | no      | 子组件点击时的回调            |
+| onDragStart      | (startDragItem) => void                          | no | 开始拖动是的回调             |
+| onDragRelease    | (data) => void                                   | no | 拖动释放时的回调，会返回排序之后的数据  |
+| onResetSort      | (data) => void                                   | no | 拖动时重新排序的回调，会返回排序后的数据 |
+| onDragging       | (gestureState: PanResponderGestureState) => void | no | 拖动时的回调函数，返回拖动的组件的位置  |
+| onDragItemActive | (item) => void                                      | no | 当要拖动的选项被激活的时候触发      |
 ## Item Props
 
 | parameter  | type   | required | description |

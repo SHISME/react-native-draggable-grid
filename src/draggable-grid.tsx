@@ -30,11 +30,12 @@ export interface IDraggableGridProps<DataType extends IBaseItemType> {
   itemHeight?: number
   dragStartAnimation?: StyleProp<any>
   onItemPress?: (item: DataType) => void
+  onDragItemActive?: (item: DataType) => void
   onDragStart?: (item: DataType) => void
   onDragging?: (gestureState: PanResponderGestureState) => void
   onDragRelease?: (newSortedData: DataType[]) => void
   onResetSort?: (newSortedData: DataType[]) => void
-  delayLongPress?:number
+  delayLongPress?: number
 }
 interface IMap<T> {
   [key: string]: T
@@ -249,6 +250,8 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
   }
   function setActiveBlock(itemIndex: number, item: DataType) {
     if (item.disabledDrag) return
+
+    props.onDragItemActive && props.onDragItemActive(item)
 
     setPanResponderCapture(true)
     setActiveItemIndex(itemIndex)
