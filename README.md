@@ -130,13 +130,14 @@ const styles = StyleSheet.create({
 ## Event Props
 
 
-| parameter  | type   | required | description |
-| :--------  | :----  | :------- | :---------- |
-| onItemPress | (item) => void | no      | Function will execute when item on press |
-| onDragStart | (startDragItem) => void | no | Function will execute when item start drag |
+| parameter  | type   | required | description                                                                   |
+| :--------  | :----  | :------- |:------------------------------------------------------------------------------|
+| onItemPress | (item) => void | no      | Function will execute when item on press                                      |
+| onDragStart | (startDragItem) => void | no | Function will execute when item start drag                                    |
 | onDragRelease | (data) => void | no | Function will execute when item release, and will return the new ordered data |
-| onResetSort | (data) => void | no | Function will execute when dragged item change sort |
-| onDragging | (gestureState: PanResponderGestureState) => void| no | Function will execute when dragging item |
+| onResetSort | (data) => void | no | Function will execute when dragged item change sort                           |
+| onDragging | (gestureState: PanResponderGestureState) => void| no | Function will execute when dragging item                                      |
+| onDragItemActive | (item) => void| no | Function will execute when any item active                                    |
 
 ## Item Props
 
