@@ -8,6 +8,8 @@ import {
   GestureResponderEvent,
   PanResponderGestureState,
   ViewStyle,
+  Platform,
+  I18nManager
 } from 'react-native'
 import { Block } from './block'
 import { findKey, findIndex, differenceBy } from './utils'
@@ -128,7 +130,7 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
     props.onDragStart && props.onDragStart(activeItem.itemData)
     const { x0, y0, moveX, moveY } = gestureState
     const activeOrigin = blockPositions[orderMap[activeItem.key].order]
-    const x = activeOrigin.x - x0
+    const x = activeOrigin.x + (I18nManager.isRTL ? x0 : -x0)
     const y = activeOrigin.y - y0
     activeItem.currentPosition.setOffset({
       x,
@@ -139,14 +141,15 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
       y,
     }
     activeItem.currentPosition.setValue({
-      x: moveX,
+      x: I18nManager.isRTL ? -moveX : moveX,
       y: moveY,
     })
   }
   function onHandMove(_: GestureResponderEvent, gestureState: PanResponderGestureState) {
     const activeItem = getActiveItem()
     if (!activeItem) return false
-    const { moveX, moveY } = gestureState
+    const { moveX:moveXOriginal, moveY } = gestureState
+    const moveX = I18nManager.isRTL ? -moveXOriginal : moveXOriginal
     props.onDragging && props.onDragging(gestureState)
 
     const xChokeAmount = Math.max(0, activeBlockOffset.x + moveX - (gridLayout.width - blockWidth))
@@ -277,8 +280,9 @@ export const DraggableGrid = function<DataType extends IBaseItemType>(
         height: blockHeight,
         position: 'absolute',
         top: items[itemIndex].currentPosition.getLayout().top,
-        left: items[itemIndex].currentPosition.getLayout().left,
-      },
+        left: I18nManager.isRTL && Platform.OS === 'web' ? undefined: items[itemIndex].currentPosition.getLayout().left,
+        right: I18nManager.isRTL && Platform.OS === 'web' ? items[itemIndex].currentPosition.getLayout().left : undefined,
+},
     ]
   }
   function getDragStartAnimation(itemIndex: number) {
